@@ -2,7 +2,7 @@
 
 set -o errexit
 
-stack_name=obido-prod-web-image
+stack_name=obido-dev-web-image
 region="$(aws configure get region)"
 bucket_name="temp-serverless-resize-$(openssl rand -hex 8)"
 account_id="$(aws sts get-caller-identity --query Account --output text \
@@ -17,7 +17,7 @@ aws s3 mb "s3://${bucket_name}"
 
 aws cloudformation package \
   --output-template-file=deploy/output.yaml \
-  --template-file=image-resize.yaml \
+  --template-file=image-resize-dev.yaml \
   --s3-bucket="${bucket_name}" \
 
 aws cloudformation deploy \
