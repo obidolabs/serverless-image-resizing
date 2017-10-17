@@ -11,11 +11,15 @@ const URL = process.env.URL;
 
 exports.handler = function (event, context, callback) {
     const key = event.queryStringParameters.key;
-    const match = key.match(/(\d+)x(\d+)x(\d+)\/(.*)/);
+    const match = key.match(/(\d+)x(\d+)x(\d+|png)\/(.*)/);
     let width = parseInt(match[1], 10);
     let height = parseInt(match[2], 10);
-    const quality = parseInt(match[3], 10);
+    let quality = match[3];
     const originalKey = match[4];
+
+    if (quality !== "png") {
+        quality = parseInt(quality, 10);
+    }
 
     if (height === 0) {
         height = 4096;
@@ -25,20 +29,26 @@ exports.handler = function (event, context, callback) {
         width = 4096;
     }
 
-    console.log(key, originalKey, width, height, quality, match);
+    let format = 'jpeg';
+    let options = {'quality': quality};
+
+    if (quality === 'png') {
+        format = 'png';
+        options = {};
+    }
 
     S3.getObject({Bucket: BUCKET, Key: originalKey}).promise()
         .then(data => Sharp(data.Body)
             .resize(width, height)
             .max()
-            .toFormat('jpeg', {'quality': quality})
+            .toFormat(format, options)
             .toBuffer()
         )
         .then(buffer => S3.putObject({
                 Body: buffer,
                 Bucket: BUCKET,
                 CacheControl: "max-age=94608000",
-                ContentType: 'image/jpeg',
+                ContentType: 'image/' + format,
                 Tagging: "resized=true",
                 Key: key,
             }).promise()
