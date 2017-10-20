@@ -64,5 +64,21 @@ exports.handler = function (event, context, callback) {
                 body: '',
             })
         )
-        .catch(err => callback(err))
+        .catch(err => {
+            console.log({
+                key: originalKey,
+                url: URL,
+                err: err
+            });
+
+            callback(null, {
+                statusCode: '404',
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'access-control-allow-methods': 'GET',
+                    'access-control-max-age': '3000'
+                },
+                body: '',
+            })
+        })
 };
