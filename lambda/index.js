@@ -39,9 +39,10 @@ exports.handler = function (event, context, callback) {
 
     S3.getObject({Bucket: BUCKET, Key: originalKey}).promise()
         .then(data => Sharp(data.Body)
-            .background({r: 255, g: 255, b: 255})
             .resize(width, height)
             .max()
+            .background({r: 255, g: 255, b: 255, alpha: 1})
+            .flatten()
             .toFormat(format, options)
             .toBuffer()
         )
