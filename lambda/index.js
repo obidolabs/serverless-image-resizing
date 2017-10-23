@@ -5,6 +5,7 @@ const S3 = new AWS.S3({
     signatureVersion: 'v4',
 });
 const Sharp = require('sharp');
+const pngquant = require('node-pngquant-native');
 
 const BUCKET = process.env.BUCKET;
 const URL = process.env.URL;
@@ -38,22 +39,40 @@ exports.handler = function (event, context, callback) {
     }
 
     S3.getObject({Bucket: BUCKET, Key: originalKey}).promise()
-        .then(data => Sharp(data.Body)
-            .resize(width, height)
-            .max()
-            .background({r: 255, g: 255, b: 255, alpha: 1})
-            .flatten()
-            .toFormat(format, options)
-            .toBuffer()
+        .then(function (data) {
+                let pipe = Sharp(data.Body)
+                    .resize(width, height)
+                    .max();
+
+                if (format === 'jpeg') {
+                    pipe
+                        .background({r: 255, g: 255, b: 255, alpha: 1})
+                        .flatten();
+                }
+
+                return pipe
+                    .toFormat(format, options)
+                    .toBuffer();
+            }
         )
-        .then(buffer => S3.putObject({
-                Body: buffer,
-                Bucket: BUCKET,
-                CacheControl: "max-age=94608000",
-                ContentType: 'image/' + format,
-                Tagging: "resized=true",
-                Key: key,
-            }).promise()
+        .then(function (buffer) {
+                let newBuffer = buffer;
+
+                if (format === 'png') {
+                    newBuffer = pngquant.compress(buffer, {
+                        quality: [60, 80]
+                    });
+                }
+
+                return S3.putObject({
+                    Body: newBuffer,
+                    Bucket: BUCKET,
+                    CacheControl: "max-age=94608000",
+                    ContentType: 'image/' + format,
+                    Tagging: "resized=true",
+                    Key: key,
+                }).promise()
+            }
         )
         .then(() => callback(null, {
                 statusCode: '301',
