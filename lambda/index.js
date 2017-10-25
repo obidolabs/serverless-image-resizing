@@ -14,15 +14,16 @@ exports.handler = function (event, context, callback) {
     const key = event.queryStringParameters.key;
     const match = key.match(/(\d+)x(\d+)x(\d+|png)\/(.*)/);
 
-    if (match.length !== 5) {
+    if (!match || match.length !== 5) {
         callback(null, {
             statusCode: '404',
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'access-control-allow-methods': 'GET',
-                'access-control-max-age': '3000'
+                'access-control-max-age': '3000',
+                'Content-Type': 'text/html'
             },
-            body: '',
+            body: '<html><head></head><body><p>404 - strona nie istnieje</p></body>'
         });
 
         return;
@@ -112,9 +113,10 @@ exports.handler = function (event, context, callback) {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'access-control-allow-methods': 'GET',
-                    'access-control-max-age': '3000'
+                    'access-control-max-age': '3000',
+                    'Content-Type': 'text/html'
                 },
-                body: '',
+                body: '<html><head></head><body><p>404 - strona nie istnieje</p></body>'
             })
         })
 };
