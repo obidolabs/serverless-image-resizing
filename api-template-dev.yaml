@@ -1,7 +1,7 @@
 ---
 swagger: 2.0
 info:
-  title: ServerlessResizeApi
+  title: obido-resize-image-dev
 paths:
   /:
     get:

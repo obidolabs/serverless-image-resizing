@@ -11,17 +11,17 @@ account_id="$(aws sts get-caller-identity --query Account --output text \
 set -o xtrace
 
 sed -e "s/REGION/${region}/g" -e "s/ACCOUNT_ID/${account_id}/g" \
-  api-template.yaml > deploy/api.yaml
+  api-template-prod.yaml > deploy/api-prod.yaml
 
 aws s3 mb "s3://${bucket_name}"
 
 aws cloudformation package \
-  --output-template-file=deploy/output.yaml \
-  --template-file=image-resize.yaml \
+  --output-template-file=deploy/output-prod.yaml \
+  --template-file=image-resize-prod.yaml \
   --s3-bucket="${bucket_name}" \
 
 aws cloudformation deploy \
-  --template-file=deploy/output.yaml \
+  --template-file=deploy/output-prod.yaml \
   --stack-name="${stack_name}" \
   --capabilities=CAPABILITY_NAMED_IAM
 

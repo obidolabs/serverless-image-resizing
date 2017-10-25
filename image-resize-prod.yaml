@@ -6,7 +6,7 @@ Resources:
   Api:
     Type: AWS::Serverless::Api
     Properties:
-      DefinitionUri: ./deploy/api.yaml
+      DefinitionUri: ./deploy/api-prod.yaml
       StageName: prod
       Variables:
         LambdaFunctionName: !Ref ResizeFunction
@@ -20,7 +20,7 @@ Resources:
         IndexDocument: index.html
         RoutingRules:
           - RedirectRule:
-              HttpRedirectCode: 307
+              HttpRedirectCode: 302
               HostName: !Sub ${Api}.execute-api.${AWS::Region}.amazonaws.com
               Protocol: https
               ReplaceKeyPrefixWith: prod?key=
