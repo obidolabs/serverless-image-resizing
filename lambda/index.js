@@ -58,6 +58,7 @@ exports.handler = function (event, context, callback) {
         .then(function (data) {
                 let pipe = Sharp(data.Body)
                     .resize(width, height)
+                    .withoutEnlargement()
                     .max();
 
                 if (format === 'jpeg') {
