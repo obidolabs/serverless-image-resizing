@@ -13,6 +13,21 @@ const URL = process.env.URL;
 exports.handler = function (event, context, callback) {
     const key = event.queryStringParameters.key;
     const match = key.match(/(\d+)x(\d+)x(\d+|png)\/(.*)/);
+
+    if (match.length !== 5) {
+        callback(null, {
+            statusCode: '404',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'access-control-allow-methods': 'GET',
+                'access-control-max-age': '3000'
+            },
+            body: '',
+        });
+
+        return;
+    }
+
     let width = parseInt(match[1], 10);
     let height = parseInt(match[2], 10);
     let quality = match[3];
