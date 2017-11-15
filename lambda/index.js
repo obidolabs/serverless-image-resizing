@@ -77,7 +77,7 @@ exports.handler = function (event, context, callback) {
 
                 if (format === 'png') {
                     newBuffer = pngquant.compress(buffer, {
-                        quality: [60, 80]
+                        quality: [60, 90]
                     });
                 }
 
